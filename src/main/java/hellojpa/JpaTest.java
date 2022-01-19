@@ -5,20 +5,16 @@ import static java.lang.System.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.swing.*;
 
 import hellojpa.domain.Address;
 import hellojpa.domain.Album;
-import hellojpa.domain.BaseEntity;
 import hellojpa.domain.Book;
 import hellojpa.domain.Child;
 import hellojpa.domain.GrandParent;
@@ -57,7 +53,9 @@ public class JpaTest {
 
 			// folderTest();  // 핑구님의 폴더 전설의 시작 // dfs 저장
 
-			folderTest2(); // 추상화
+			// folderTest2(); // 추상화 : 문제의 joined 쿼리
+			folderTest3(); // OneToOne
+
 
 			// lazyAndEagerLoadingTest(); // 즉시, 지연 로딩 테스트
 
@@ -77,6 +75,37 @@ public class JpaTest {
 		}
 	}
 
+	private static void folderTest3() {
+		Folder folderA = new Folder();
+		folderA.setName("folder A");
+		folderA.setShared(false);
+
+		Folder folderB = new Folder();
+		folderB.setName("folder B");
+		folderB.setShared(false);
+
+		// BookMark bookmarkA = new BookMark();
+		// bookmarkA.setName("bookmark A");
+		// bookmarkA.setUrl("www.naver.com");
+
+		folderA.addChildren(folderB);
+		// folderA.addChildren(folderB, bookmarkA);
+
+		em.persist(folderA);
+		em.persist(folderB);
+		// em.persist(bookmarkA);
+
+		em.flush();
+		em.clear();
+
+		File findFile = em.find(File.class, folderA.getId());
+		out.println("findFile = " + findFile.getName());
+
+		// BookMark findBookMark = em.find(BookMark.class, bookmarkA.getId());
+		// out.println("findBookMark = " + findBookMark.getName());
+	}
+
+/*
 	private static void folderTest2() {
 
 		Folder aFolder = new Folder();
@@ -111,10 +140,13 @@ public class JpaTest {
 		
 		// 모든 폴더 찾아내기
 		// File findRootFile = em.find(File.class, rootFileId);
+		List<File> findRootFiles = em.createQuery("select f from File f", File.class).getResultList();
+		// List findRootFiles = em.createQuery("select f from File f").getResultList();
+
 		// out.println("findFolder = " + findRootFile);
 
-		List<File> findRootFiles = em.createQuery("select f from File f", File.class).getResultList();
-		out.println("findRootFiles = " + findRootFiles);
+		// List<Folder> findRootFolders = em.createQuery("select f from Folder f", Folder.class).getResultList();
+		// out.println("findRootFolders = " + findRootFolders);
 
 
 		// Queue<File> queue = new LinkedList<>();
@@ -132,6 +164,7 @@ public class JpaTest {
 
 		// em.remove(findRootFile);
 	}
+*/
 
 	private static void valueTypeCollectionTest() {
 

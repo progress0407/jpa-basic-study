@@ -1,22 +1,27 @@
 package hellojpa.test;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
-import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Entity
+// @Entity
 @Getter
 public class BookMark extends File {
 
+	@Id
+	@GeneratedValue
+	private Long id;
+
 	private String url;
 
-	public BookMark setUrl(String url) {
+	@OneToOne(mappedBy = "outer")
+	private Folder outer;
+
+	public void setUrl(String url) {
 		this.url = url;
-		return this;
 	}
 
 	@Override
