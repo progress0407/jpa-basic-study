@@ -13,10 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+// @Entity
 abstract public class File {
 
 	@Id @GeneratedValue
@@ -24,19 +21,4 @@ abstract public class File {
 
 	private String name;
 
-	@JoinColumn(name = "PARENT_ID")
-	@ManyToOne(fetch = FetchType.LAZY)
-	private File parent;
-
-	@JoinColumn(name = "SUB_ID")
-	@OneToOne(fetch = FetchType.LAZY)
-	private File sub;
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setParent(File parent) {
-		this.parent = parent;
-	}
 }

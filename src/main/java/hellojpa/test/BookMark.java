@@ -17,15 +17,4 @@ public class BookMark extends File {
 
 	private String url;
 
-	@OneToOne(mappedBy = "outer")
-	private Folder outer;
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	@Override
-	public String toString() {
-		return "BookMark{}";
-	}
 }

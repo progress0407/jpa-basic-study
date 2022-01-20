@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
+@Getter @Setter
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor

@@ -4,6 +4,7 @@ import static java.lang.System.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,14 +24,11 @@ import hellojpa.domain.Movie;
 import hellojpa.domain.Parent;
 import hellojpa.domain.Period;
 import hellojpa.domain.Team;
-import hellojpa.test.BookMark;
-import hellojpa.test.File;
-import hellojpa.test.Folder;
 
 public class JpaTest {
 
-	private static EntityManagerFactory emf;
-	private static EntityManager em;
+	private static final EntityManagerFactory emf;
+	private static final EntityManager em;
 
 	static {
 		emf = Persistence.createEntityManagerFactory("hello");
@@ -54,8 +52,6 @@ public class JpaTest {
 			// folderTest();  // 핑구님의 폴더 전설의 시작 // dfs 저장
 
 			// folderTest2(); // 추상화 : 문제의 joined 쿼리
-			folderTest3(); // OneToOne
-
 
 			// lazyAndEagerLoadingTest(); // 즉시, 지연 로딩 테스트
 
@@ -63,7 +59,7 @@ public class JpaTest {
 
 			// valueTypeTest(); // 값 타입 테스트트
 
-			// valueTypeCollectionTest(); // 값 타입 컬렉션 테스트
+			valueTypeCollectionTest(); // 값 타입 컬렉션 테스트
 
 			out.println("----------------------- commit start -----------------------");
 			tx.commit();
@@ -73,36 +69,6 @@ public class JpaTest {
 			tx.rollback();
 			e.printStackTrace();
 		}
-	}
-
-	private static void folderTest3() {
-		Folder folderA = new Folder();
-		folderA.setName("folder A");
-		folderA.setShared(false);
-
-		Folder folderB = new Folder();
-		folderB.setName("folder B");
-		folderB.setShared(false);
-
-		// BookMark bookmarkA = new BookMark();
-		// bookmarkA.setName("bookmark A");
-		// bookmarkA.setUrl("www.naver.com");
-
-		folderA.addChildren(folderB);
-		// folderA.addChildren(folderB, bookmarkA);
-
-		em.persist(folderA);
-		em.persist(folderB);
-		// em.persist(bookmarkA);
-
-		em.flush();
-		em.clear();
-
-		File findFile = em.find(File.class, folderA.getId());
-		out.println("findFile = " + findFile.getName());
-
-		// BookMark findBookMark = em.find(BookMark.class, bookmarkA.getId());
-		// out.println("findBookMark = " + findBookMark.getName());
 	}
 
 /*
@@ -174,19 +140,83 @@ public class JpaTest {
 		favoriteFoods.add("돈까스");
 
 		List<Address> addressHistory = new ArrayList<>();
-		addressHistory.add(new Address("old city", "street", "zipcode"));
-		addressHistory.add(new Address("new city", "street", "zipcode"));
+		addressHistory.add(new Address("old1 city", "street", "zipcode"));
+		addressHistory.add(new Address("old2 city", "street", "zipcode"));
 
 		Member memberA = Member
 			.builder()
 			.name("user A")
 			.favoriteFoods(favoriteFoods)
 			.addressHistory(addressHistory)
+			.homeAddress(new Address("homne city", "home street", "zipcode"))
 			.build();
 
+		// out.println("#1 memberA.getId() = " + memberA.getId());
+
 		em.persist(memberA);
+
+		// out.println("#2 memberA.getId() = " + memberA.getId()); // 이때 ID 생성
+
+		em.flush();
+		em.clear();
+
+		// out.println("#3 memberA.getId() = " + memberA.getId());
+/*
+		memberA.getAddressHistory()
+			.addAll(Arrays.asList(
+				new Address("get and add city", "get and add street", "get and add zipcode"),
+				new Address("get and add city 2", "get and add street 2", "get and add zipcode 3"))
+			);
+*/
+
+		// memberA.setAddressHistory(Arrays.asList(new Address("updated city", "updated street", "updated zipcode")));
+
+		// em.remove(memberA);
+
+		out.println("================ #START ===============");
+		Member findMember = em.find(Member.class, memberA.getId());
+
+		// out.println("=========== #1 ==============");
+		// List<Address> findAddressHistory = findMember.getAddressHistory();
+		// out.println("=========== #2 ==============");
+		// for (Address address : findAddressHistory) {
+		// 	out.println("address = " + address);
+		// }
+		//
+		// Set<String> findFavoriteFoods = findMember.getFavoriteFoods();
+		// for (String findFavoriteFood : findFavoriteFoods) {
+		// 	out.println("findFavoriteFood = " + findFavoriteFood);
+		// }
+
+		// findMember.setAddressHistory(Arrays.asList(new Address("updated city", "s", "z")));
+		// findMember.getAddressHistory().get(0).setCity("updated city");
+
+		// findMember.getHomeAddress().setCity("updated city"); // 값 타입은 "값이기 떄문에 이렇게 하지 말것 !!!
+		Address homeAddress = findMember.getHomeAddress();
+		findMember.setHomeAddress(new Address("updated city", homeAddress.getStreet(), homeAddress.getZipcode()));
+
+		findMember.getFavoriteFoods().remove("치킨");
+		findMember.getFavoriteFoods().add("한식");
+
+		findMember.getAddressHistory().remove(new Address("old1 city", "street", "zipcode"));
+		findMember.getAddressHistory().add(new Address("new1 city", "street", "zipcode"));
+
+		em.persist(findMember);
+
+		// jpa 에서 플러시할 때 순서의 보장은 해주지 않는다 !
+
+		// delete 는 하나만 햇는데 모두 삭제하고 다시 인서트트
+		// @OrderColumn(name = "address_history_order") 에
+
+		/**
+		 *
+		 */
+
+		// 값타입을 엔티티로 승격해서 사용
+
 	}
 
+/*
 	private static void valueTypeTest() {
 
 		LocalDateTime startDateTime = LocalDateTime.of(2020, 4, 1, 9, 0); // 내 입사일
@@ -216,6 +246,7 @@ public class JpaTest {
 		em.persist(memberA);
 		em.persist(memberB);
 	}
+*/
 
 	private static void grandParentsCascadeTest() {
 		GrandParent grandParentA = GrandParent.builder().name("grand parent A").build();
