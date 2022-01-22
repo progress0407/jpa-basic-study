@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -17,6 +18,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 
 import lombok.AccessLevel;
@@ -26,7 +28,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
+// @Entity
 @Builder
 @Setter
 @Getter
@@ -79,19 +81,23 @@ public class Member {
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(
-		name = "FAVORITE_FOOD" ,
+		name = "FAVORITE_FOOD",
 		joinColumns = @JoinColumn(name = "MEMBER_ID")
 	)
 	@Column(name = "FOOD_NAME")
 	private Set<String> favoriteFoods = new HashSet<>();
 
-	@OrderColumn(name = "address_history_order")
-	@ElementCollection
-	@CollectionTable(
-		name = "ADDRESS" ,
-		joinColumns = @JoinColumn(name = "MEMBER_ID")
-	)
-	private List<Address> addressHistory = new ArrayList<>();
+	// @OrderColumn(name = "address_history_order")
+	// @ElementCollection
+	// @CollectionTable(
+	// 	name = "ADDRESS" ,
+	// 	joinColumns = @JoinColumn(name = "MEMBER_ID")
+	// )
+	// private List<Address> addressHistory = new ArrayList<>();
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "MEMBER_ID")
+	private List<AddressEntity> addressHistory = new ArrayList<>();
 
 	// @OneToOne(mappedBy = "member", fetch = FetchType.EAGER)
 	// private Locker locker;
@@ -108,6 +114,7 @@ public class Member {
 */
 
 	@Override
+
 	public String toString() {
 		return "Member{" +
 			"id=" + id +

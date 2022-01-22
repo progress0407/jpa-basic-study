@@ -6,15 +6,14 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-// @Entity
-@Getter
+@Entity
+@Getter @Setter @ToString
 public class BookMark extends File {
-
-	@Id
-	@GeneratedValue
-	private Long id;
 
 	private String url;
 
+	private Long size;
 }
