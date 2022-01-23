@@ -12,9 +12,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-// @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "D_TYPE")
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn
 @Getter @Setter @ToString
 abstract public class Item {
 

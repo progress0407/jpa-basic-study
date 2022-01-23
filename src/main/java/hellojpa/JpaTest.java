@@ -21,6 +21,7 @@ import hellojpa.domain.Album;
 import hellojpa.domain.Book;
 import hellojpa.domain.Child;
 import hellojpa.domain.GrandParent;
+import hellojpa.domain.Item;
 import hellojpa.domain.Locker;
 import hellojpa.domain.Member;
 import hellojpa.domain.Movie;
@@ -52,7 +53,7 @@ public class JpaTest {
 		tx.begin();
 
 		try {
-			// test101(); // mapped class 상속관계
+			test101(); // mapped class 상속관계
 
 			// folderTest();  // 핑구님의 폴더 전설의 시작 // dfs 저장
 
@@ -66,7 +67,7 @@ public class JpaTest {
 
 			// valueTypeCollectionTest(); // 값 타입 컬렉션 테스트
 
-			oneToOneTest(); // 원투원 테스트
+			// oneToOneTest(); // 원투원 테스트
 
 			out.println("----------------------- commit start -----------------------");
 			tx.commit();
@@ -398,6 +399,7 @@ public class JpaTest {
 		album.setPrice(50_000);
 		em.persist(album);
 
+
 		Book book = new Book();
 		book.setName("JPA");
 		book.setAuthor("영한 킴");
@@ -405,12 +407,22 @@ public class JpaTest {
 		book.setPrice(40_000);
 		em.persist(book);
 
+
 		Movie movie = new Movie();
 		movie.setPrice(15_000);
 		movie.setName("기생충");
 		movie.setDirector("봉준호");
 		movie.setActor("박소담");
 		em.persist(movie);
+
+
+		List<Item> resultList =
+			em.createQuery("select i from Item i where type(i) = Book", Item.class)
+			.getResultList();
+
+		for (Item findItem : resultList) {
+			out.println("findItem = " + findItem);
+		}
 	}
 
 	private static void close() {
