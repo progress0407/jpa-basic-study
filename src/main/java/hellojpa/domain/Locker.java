@@ -1,5 +1,7 @@
 package hellojpa.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,33 +15,35 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-// @Entity
+@Entity
 @Builder
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Locker {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Locker implements Serializable {
 
-	@Id
-	@GeneratedValue
-	private Long id;
+	// @Id
+	// @GeneratedValue
+	// private Long id;
 
 	private String name;
 
+	@Id
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "MEMBER_ID")
 	private Member member;
 
-	// public void mapMember(Member member) {
-	// 	this.member = member;
-	// 	member.setLocker(this);
-	// }
+	public void mapMember(Member member) {
+		this.member = member;
+		member.setLocker(this);
+	}
 
 	@Override
 	public String toString() {
 		return "Locker{" +
-			"id=" + id +
-			", name='" + name + '\'' +
+			"name='" + name + '\'' +
 			'}';
 	}
 }

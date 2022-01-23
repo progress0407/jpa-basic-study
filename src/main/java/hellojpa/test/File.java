@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@Entity
+// @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Getter @Setter @ToString
 public class File {

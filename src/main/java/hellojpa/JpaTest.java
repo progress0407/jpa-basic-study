@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceUtil;
 import javax.persistence.Query;
 
 import hellojpa.domain.Address;
@@ -20,6 +21,7 @@ import hellojpa.domain.Album;
 import hellojpa.domain.Book;
 import hellojpa.domain.Child;
 import hellojpa.domain.GrandParent;
+import hellojpa.domain.Locker;
 import hellojpa.domain.Member;
 import hellojpa.domain.Movie;
 import hellojpa.domain.Parent;
@@ -54,7 +56,7 @@ public class JpaTest {
 
 			// folderTest();  // 핑구님의 폴더 전설의 시작 // dfs 저장
 
-			folderTest2(); // 추상화 : 문제의 joined 쿼리
+			// folderTest2(); // 추상화 : 문제의 joined 쿼리
 
 			// lazyAndEagerLoadingTest(); // 즉시, 지연 로딩 테스트
 
@@ -64,6 +66,8 @@ public class JpaTest {
 
 			// valueTypeCollectionTest(); // 값 타입 컬렉션 테스트
 
+			oneToOneTest(); // 원투원 테스트
+
 			out.println("----------------------- commit start -----------------------");
 			tx.commit();
 			out.println("----------------------- commit end -----------------------");
@@ -72,6 +76,32 @@ public class JpaTest {
 			tx.rollback();
 			e.printStackTrace();
 		}
+	}
+
+	private static void oneToOneTest() {
+		Member memberA = Member.builder().name("swcho").build();
+		Locker lockerA = Locker.builder().name("locker a").build();
+
+		lockerA.mapMember(memberA);
+
+		em.persist(lockerA);
+		em.persist(memberA);
+
+		em.flush();
+		em.clear();
+
+		PersistenceUtil pu = Persistence.getPersistenceUtil();
+
+		Member findMember = em.find(Member.class, memberA.getId());
+
+		Locker findLocker = findMember.getLocker();
+		out.println("findLocker class name = " + findLocker.getClass().getName());
+
+		out.println("is findLocker Loaded = " + pu.isLoaded(findLocker));
+
+		out.println("findLocker name = " + findLocker.getName());
+		out.println("is findLocker Loaded = " + pu.isLoaded(findLocker));
+
 	}
 
 	private static void folderTest2() {
@@ -127,6 +157,7 @@ public class JpaTest {
 
 	}
 
+/*
 	private static void valueTypeCollectionTest() {
 
 		Set<String> favoriteFoods = new HashSet<>();
@@ -143,7 +174,7 @@ public class JpaTest {
 			.name("user A")
 			.favoriteFoods(favoriteFoods)
 			.homeAddress(new Address("homne city", "home street", "zipcode"))
-			.addressHistory(addressHistory)
+			// .addressHistory(addressHistory)
 			.build();
 
 		em.persist(memberA);
@@ -166,6 +197,7 @@ public class JpaTest {
 
 		em.persist(findMember);
 	}
+*/
 
 /*
 	private static void valueTypeTest() {
